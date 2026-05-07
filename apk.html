@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelacak Tugas Akademik</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .task-list {
+            margin-top: 25px;
+        }
+        .task-item {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #e74c3c;
+        }
+        .task-info h4 {
+            margin: 0 0 5px 0;
+        }
+        .task-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            width: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Pelacak Tugas Akademik</h2>
+    
+    <div class="form-group">
+        <label for="taskName">Nama Tugas / Proyek</label>
+        <input type="text" id="taskName" placeholder="Contoh: Makalah Sejarah">
+    </div>
+    <div class="form-group">
+        <label for="taskDate">Tenggat Waktu (Deadline)</label>
+        <input type="date" id="taskDate">
+    </div>
+    <button onclick="addTask()">Tambah Tugas</button>
+
+    <div class="task-list" id="taskList">
+        <!-- Daftar tugas akan muncul di sini -->
+    </div>
+</div>
+
+<script>
+    // Mengambil elemen dari HTML
+    const taskNameInput = document.getElementById('taskName');
+    const taskDateInput = document.getElementById('taskDate');
+    const taskListContainer = document.getElementById('taskList');
+
+    // Fungsi untuk menghitung sisa hari
+    function calculateDaysLeft(deadline) {
+        const today = new Date();
+        const deadlineDate = new Date(deadline);
+        const timeDiff = deadlineDate.getTime() - today.getTime();
+        const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        return daysLeft;
+    }
+
+    // Fungsi untuk menambahkan tugas baru
+    function addTask() {
+        const taskName = taskNameInput.value;
+        const taskDate = taskDateInput.value;
+
+        // Validasi input
+        if (taskName === '' || taskDate === '') {
+            alert('Mohon isi nama tugas dan tenggat waktu!');
+            return;
+        }
+
+        const daysLeft = calculateDaysLeft(taskDate);
+        let daysText = '';
+
+        if (daysLeft > 0) {
+            daysText = `Sisa ${daysLeft} hari lagi`;
+        } else if (daysLeft === 0) {
+            daysText = 'Hari ini!';
+        } else {
+            daysText = 'Terlambat!';
+        }
+
+        // Membuat elemen HTML untuk tugas baru
+        const taskItem = document.createElement('div');
+        taskItem.className = 'task-item';
+        
+        // Mengubah warna border berdasarkan sisa waktu
+        if(daysLeft > 3) {
+            taskItem.style.borderLeftColor = '#2ecc71'; // Hijau jika masih lama
+        } else if (daysLeft > 0) {
+            taskItem.style.borderLeftColor = '#f1c40f'; // Kuning jika sudah dekat
+        } else {
+            taskItem.style.borderLeftColor = '#e74c3c'; // Merah jika terlambat/hari ini
+        }
+
+        taskItem.innerHTML = `
+            <div class="task-info">
+                <h4>${taskName}</h4>
+                <p>Deadline: ${taskDate} (${daysText})</p>
+            </div>
+            <button class="delete-btn" onclick="this.parentElement.remove()">Hapus</button>
+        `;
+
+        // Menambahkan elemen ke dalam daftar
+        taskListContainer.appendChild(taskItem);
+
+        // Mengosongkan form setelah ditambah
+        taskNameInput.value = '';
+        taskDateInput.value = '';
+    }
+</script>
+
+</body>
+</html>
